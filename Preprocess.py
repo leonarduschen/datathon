@@ -12,7 +12,7 @@ def preprocess(df,train_pctg=0.5,val_pctg =0.2,test_pctg=0.3):
     dataloader = dict()
     for key in data.keys():
         tensor_data = torch.from_numpy(data[key].values)
-        Y = tensor_data[:,1]
+        Y = tensor_data[:,0]
         X = tensor_data[:,1:]
         dataloader[key] = (X,Y)
     
@@ -33,4 +33,11 @@ def train_val_test_split(df,train_pctg=0.5,val_pctg =0.2,test_pctg=0.3):
     train = data[:MaxTrainidx]
     val = data[MaxTrainidx:MaxValidationidx]
     test = data[MaxValidationidx:]
+    print(f"""
+          Completed train val test split 
+          -------------------------------
+          Total data : {rows} rows
+          Train data : {train.shape} rows
+          Val data : {val.shape} rows
+          Test data {test.shape} rows""")
     return train,val,test

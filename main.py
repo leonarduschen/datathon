@@ -6,7 +6,7 @@ import pandas as pd
 if __name__ == '__main__':
     df = pd.read_csv('./rawdata/consolidated_autocaffe_data.csv')
     
-    data = preprocess(df)
+    data = preprocess(df)   
     
     features = data['train'][0].shape[1]
     Network = generateANN(features)    
