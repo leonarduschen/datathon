@@ -100,7 +100,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
                     loss.backward()
                     optimizer.step()
         
-            epoch_loss = loss.item()/preds.shape[0]           
+            epoch_loss = loss.item()          
             loss_Dict[phase].append(epoch_loss)
 
             print('{} Loss: {:.4f}'.format(phase, epoch_loss))

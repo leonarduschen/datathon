@@ -26,7 +26,7 @@ NUM_EPOCHS = 10000
 
 #Define loss criterion
 def loss_fn(ypred,y):
-  return (ypred - y).pow(2).sum()
+  return (ypred - y).pow(2).mean()
 
 #Define early stopping's patience
 Patience = 10
