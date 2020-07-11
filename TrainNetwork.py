@@ -63,6 +63,7 @@ def plot_loss(trainLoss,valLoss):
         
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,earlystoppingPatience=10,device =torch.device("cpu")):
     START_TIME = time.time()
+
     loss_Dict=defaultdict(list)
     
     model = model.to(device)
@@ -93,7 +94,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
             with torch.set_grad_enabled(phase == 'train'):
                 # Get model prediction and calculate loss
                 preds = model(inputs.float())
-                loss = criterion(ypred = preds, y = bels)
+                loss = criterion(ypred = preds, y = labels)
 
                 # Back propagation + optimize only if in training phase
                 if phase == 'train':
