@@ -63,7 +63,6 @@ def plot_loss(trainLoss,valLoss):
         
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,earlystoppingPatience=10,device =torch.device("cpu")):
     START_TIME = time.time()
-    BEST_LOSS = np.inf
     loss_Dict=defaultdict(list)
     
     model = model.to(device)
@@ -77,9 +76,9 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
         phases = ['train', 'val']
         for phase in phases:
             if phase == 'train':
-                model.train()  # Set model to training mode
+                model.train(True)  # Set model to training mode
             else:
-                model.eval()   # Set model to evaluate mode
+                model.train(False)   # Set model to evaluate mode
 
             # Load data
             inputs, labels = dataloaders[phase]
@@ -94,13 +93,13 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
             with torch.set_grad_enabled(phase == 'train'):
                 # Get model prediction and calculate loss
                 preds = model(inputs.float())
-                loss = criterion(preds, labels)
+                loss = criterion(ypred = preds, y = bels)
 
                 # Back propagation + optimize only if in training phase
                 if phase == 'train':
                     loss.backward()
                     optimizer.step()
-
+        
             epoch_loss = loss.item()/preds.shape[0]           
             loss_Dict[phase].append(epoch_loss)
 
@@ -109,7 +108,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
             #Check for early stopping condition during validation
             if phase == 'val':
                 early_stopping(epoch_loss, model) 
-        plot_loss(loss['train'],loss['val'])
+        plot_loss(trainLoss = loss_Dict['train'],valLoss = loss_Dict['val'])
         if early_stopping.early_stop:
             print("Early stopping")
             break

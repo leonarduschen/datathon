@@ -5,6 +5,7 @@ Spyder Editor
 This is a temporary script file.
 """
 import torch
+import datetime
 def preprocess(df,train_pctg=0.5,val_pctg =0.2,test_pctg=0.3):
     df[df.Energy==0].Energy = df[df.Energy!=0].Energy.mean()
     data=dict()
@@ -20,10 +21,7 @@ def preprocess(df,train_pctg=0.5,val_pctg =0.2,test_pctg=0.3):
     return dataloader
 
 def train_val_test_split(df,train_pctg=0.5,val_pctg =0.2,test_pctg=0.3):
-    try:
-        df['Timestamp'] = df['Timestamp'].apply(lambda x: datetime.datetime.strptime(x,'%d/%m/%Y %H:%S'))
-    except:
-        pass
+    df['Timestamp'] = df['Timestamp'].apply(lambda x: datetime.datetime.strptime(x,'%d/%m/%Y %H:%S'))
     rows = df.shape[0]
     MaxTrainidx = round(rows * train_pctg)
     MaxValidationidx= round(rows * val_pctg)+MaxTrainidx
