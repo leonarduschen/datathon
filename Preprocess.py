@@ -6,6 +6,7 @@ This is a temporary script file.
 """
 import torch
 def preprocess(df,train_pctg=0.5,val_pctg =0.2,test_pctg=0.3):
+    df[df.Energy==0].Energy = df[df.Energy!=0].Energy.mean()
     data=dict()
     data['train'],data['val'],data['test'] = train_val_test_split(df)
     
