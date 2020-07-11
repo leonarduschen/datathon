@@ -93,7 +93,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
             with torch.set_grad_enabled(phase == 'train'):
                 # Get model prediction and calculate loss
                 preds = model(inputs.float())
-                loss = criterion(ypred = preds, y = labels)
+                loss = criterion(ypred = preds, y = labels.view(-1,1))
 
                 # Back propagation + optimize only if in training phase
                 if phase == 'train':
