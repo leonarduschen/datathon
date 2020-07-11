@@ -61,11 +61,12 @@ def plot_loss(trainLoss,valLoss):
     plt.pause(0.0001)
 
         
-def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,earlystoppingPatience=10):
+def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,earlystoppingPatience=10,device =torch.device("cpu")):
     START_TIME = time.time()
     BEST_LOSS = np.inf
     loss_Dict=defaultdict(list)
-
+    
+    model = model.to(device)
     early_stopping = EarlyStopping(patience=earlystoppingPatience, verbose=True)
 
     for epoch in range(num_epochs):
@@ -82,6 +83,8 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
 
             # Load data
             inputs, labels = dataloaders[phase]
+            inputs = inputs.to(device)
+            labels = labels.to(device)
             
             # zero the parameter gradients
             optimizer.zero_grad()
