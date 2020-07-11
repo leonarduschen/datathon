@@ -18,7 +18,7 @@ def generateANN(D_in,D_out=1):
     return model
 
 #Define Optimizer Config
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-1
 optimizer = torch.optim.Adam
 
 #Define epochs parameters

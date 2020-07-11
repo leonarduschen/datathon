@@ -11,17 +11,18 @@ if __name__ == '__main__':
     else:
         device = torch.device("cpu")
         print("Running on the CPU") 
-
-    df = pd.read_csv('./rawdata/consolidated_autocaffe_data.csv')
     
+    #PREPROCESS DATA
+    df = pd.read_csv('./rawdata/consolidated_autocaffe_data.csv')
     data = preprocess(df)   
     
+    #GENERATE NETWORK 
     features = data['train'][0].shape[1]
-    Network = generateANN(features)   
+    Network = generateANN(features).to(device)
     newoptimizer = optimizer(Network.parameters(), lr=LEARNING_RATE)
     
+    #TRAIN NETWORK
     _,loss=train_model(Network,data,criterion=loss_fn,optimizer=newoptimizer,
                        num_epochs = NUM_EPOCHS,device=device)
     
     
-    plot_loss(loss['train'],loss['val'])

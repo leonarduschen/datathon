@@ -66,7 +66,6 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
 
     loss_Dict=defaultdict(list)
     
-    model = model.to(device)
     early_stopping = EarlyStopping(patience=earlystoppingPatience, verbose=True)
 
     for epoch in range(num_epochs):
@@ -109,6 +108,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
             #Check for early stopping condition during validation
             if phase == 'val':
                 early_stopping(epoch_loss, model) 
+                
         plot_loss(trainLoss = loss_Dict['train'],valLoss = loss_Dict['val'])
         if early_stopping.early_stop:
             print("Early stopping")
