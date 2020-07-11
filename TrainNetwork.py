@@ -58,6 +58,7 @@ def plot_loss(trainLoss,valLoss):
     plt.title("Train vs Validation Loss")
     plt.legend()
     plt.show()
+    plt.pause(0.0001)
 
         
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,earlystoppingPatience=10):
@@ -105,7 +106,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
             #Check for early stopping condition during validation
             if phase == 'val':
                 early_stopping(epoch_loss, model) 
-
+        plot_loss(loss['train'],loss['val'])
         if early_stopping.early_stop:
             print("Early stopping")
             break
@@ -116,6 +117,6 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,early
     # load best model weights
     model.load_state_dict(torch.load('checkpoint.pt'))
 
-    plot_loss(loss['train'],loss['val'])
+    
 
     return model,loss_Dict
