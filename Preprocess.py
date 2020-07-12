@@ -8,8 +8,6 @@ import torch
 import datetime
 def preprocess(df,train_pctg=0.5,val_pctg =0.2,test_pctg=0.3):
     df.Energy = df.Energy.apply(lambda x : df[df.Energy!=0].Energy.mean() if x==0 else x)
-    #THIS IS FEATURE FOR BASELINE MODEL
-    df.insert(2,'t-18',df.Energy.shift(18))
     data=dict()
     data['train'],data['val'],data['test'] = train_val_test_split(df)
     
