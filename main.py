@@ -32,5 +32,5 @@ if __name__ == '__main__':
     baseline_loss = baseline_model_loss(data, loss_fn)
     print("Base model loss on test dataset : ", baseline_loss)
 
-    ann_loss = test_model_loss(network, data, loss_fn)
+    ann_loss = test_model_loss(network, data, loss_fn, device)
     print("Network loss on test dataset : ", ann_loss)

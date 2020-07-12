@@ -6,3 +6,5 @@ venv
 __pycache__
 .ipynb_checkpoints
 checkpoint.pt
+debugger.ipynb
+other_model
