@@ -116,7 +116,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000, earl
             if phase == 'val':
                 early_stopping(epoch_loss, model)
 
-        plot_loss(trainLoss=loss_dict['train'], valLoss=loss_dict['val'])
+        #plot_loss(trainLoss=loss_dict['train'], valLoss=loss_dict['val'])
         if early_stopping.early_stop:
             print("Early stopping")
             break

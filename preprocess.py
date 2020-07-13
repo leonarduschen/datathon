@@ -8,7 +8,7 @@ import torch
 import datetime
 
 
-def preprocess(df, train_pctg=0.5, val_pctg=0.2, test_pctg=0.3):
+def preprocess(df, train_pctg=0.8, val_pctg=0.1, test_pctg=0.1):
     df['Energy'] = df['Energy'].apply(
         lambda x: df[df['Energy'] != 0]['Energy'].mean() if x == 0 else x)
     data = dict()
@@ -24,7 +24,7 @@ def preprocess(df, train_pctg=0.5, val_pctg=0.2, test_pctg=0.3):
     return dataloader
 
 
-def train_val_test_split(df, train_pctg=0.5, val_pctg=0.2, test_pctg=0.3):
+def train_val_test_split(df, train_pctg=0.8, val_pctg=0.1, test_pctg=0.1):
     df['Timestamp'] = df['Timestamp'].apply(
         lambda x: datetime.datetime.strptime(x, '%d/%m/%Y %H:%S'))
 

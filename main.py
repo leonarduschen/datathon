@@ -18,11 +18,12 @@ if __name__ == '__main__':
     # PREPROCESS DATA
     df = pd.read_csv('./rawdata/consolidated_autocaffe_data.csv')
     data = preprocess(df)
-
+    
     # GENERATE NETWORK
     features = data['train'][0].shape[1]
     network = generateANN(features).to(device)
-    newoptimizer = optimizer(network.parameters(), lr=learning_rate)
+    newoptimizer = optimizer(network.parameters(),
+                             lr=learning_rate, weight_decay=1e-4)
 
     # TRAIN NETWORK
     network, loss = train_model(network, data, criterion=loss_fn, optimizer=newoptimizer,

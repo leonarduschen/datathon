@@ -10,9 +10,13 @@ import torch
 
 
 def generateANN(D_in, D_out=1):
-    H = D_in//2
+    H = D_in
 
     model = torch.nn.Sequential(
+        torch.nn.Linear(D_in, H),
+        torch.nn.ReLU(),
+        torch.nn.Linear(D_in, H),
+        torch.nn.ReLU(),
         torch.nn.Linear(D_in, H),
         torch.nn.ReLU(),
         torch.nn.Linear(H, D_out),
@@ -21,14 +25,15 @@ def generateANN(D_in, D_out=1):
 
 
 # Define Optimizer Config
-learning_rate = 1e-1
+learning_rate = 1e-4
 optimizer = torch.optim.Adam
 
 # Define epochs parameters
 num_epochs = 10000
 
 # Define loss criterion
+def loss_fn(ypred,y):
+    return torch.mean((ypred-y)**2)
 
-
-def loss_fn(ypred, y):
-    return (ypred - y).pow(2).mean()
+# def loss_fn(ypred, y):
+#     return (ypred - y).pow(2).mean()
