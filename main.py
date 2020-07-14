@@ -1,4 +1,3 @@
-from preprocess import preprocess
 from network_config import generateANN, optimizer, learning_rate, num_epochs, loss_fn
 from train_network import train_model, plot_loss
 from test_model import test_model_loss
@@ -21,22 +20,26 @@ if __name__ == '__main__':
 
     #Load and generate features
     df = pd.read_csv('./rawdata/consolidated_autocaffe_data.csv')
-    dataset = Dataset(df, lags_period = [1,2,3,4,5,23], EMA_spans = [5,10,15])
+    dataset = Dataset(df, lags_period = [1], lags_columns = ['speed-guitrancourt', 'speed-lieusaint',
+       'speed-lvs-pussay', 'speed-parc-du-gatinais', 'speed-arville',
+       'speed-boissy-la-riviere', 'speed-angerville-1', 'speed-angerville-2'])
     
     #Aggregate all features, split, clean
     dataset.generate_final_dataset()
     dataset.train_val_test_split(dataset.final_df, 0.8, 0.1, 0.1)
     dataset.clean_train_val_test()
+    print(dataset.train.columns)
     
     #Load to torch
     data = dataset.load_data(drop_timestamp = True)
+    print('load successful')
     
 
     # GENERATE NETWORK
     features = data['train'][0].shape[1]
     network = generateANN(features).to(device)
     newoptimizer = optimizer(network.parameters(),
-                             lr=learning_rate, weight_decay=1e-4)
+                             lr=learning_rate, weight_decay=1e-5)
 
     # TRAIN NETWORK
     network, loss = train_model(network, data, criterion=loss_fn, optimizer=newoptimizer,

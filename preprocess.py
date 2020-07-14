@@ -6,40 +6,37 @@ This is a temporary script file.
 """
 import torch
 import datetime
-import pandas as pd
 
 
 def preprocess(df, train_pctg=0.8, val_pctg=0.1, test_pctg=0.1):
-    df_dict = dict()
-    dataloader_dict = dict()
+    df['Energy'] = df['Energy'].apply(
+        lambda x: df[df['Energy'] != 0]['Energy'].mean() if x == 0 else x)
+    data = dict()
+    data['train'], data['val'], data['test'] = train_val_test_split(df)
 
-    df.drop(['Timestamp'], inplace = True, axis = 1)
-    
-    df_dict['train'], df_dict['val'], df_dict['test'] = train_val_test_split(
-        df, train_pctg, val_pctg, test_pctg)
-
-    
-    
-    for key in df_dict.keys():
-        tensor_data = torch.from_numpy(df_dict[key].values)
+    dataloader = dict()
+    for key in data.keys():
+        tensor_data = torch.from_numpy(data[key].values)
         Y = tensor_data[:, 0]
         X = tensor_data[:, 1:]
-        dataloader_dict[key] = (X, Y)
+        dataloader[key] = (X, Y)
 
-    return dataloader_dict
+    return dataloader
 
 
-def train_val_test_split(df, train_pctg, val_pctg, test_pctg):
+def train_val_test_split(df, train_pctg=0.8, val_pctg=0.1, test_pctg=0.1):
+    df['Timestamp'] = df['Timestamp'].apply(
+        lambda x: datetime.datetime.strptime(x, '%d/%m/%Y %H:%S'))
+
     rows = df.shape[0]
-    max_train_idx = round(rows * train_pctg)
-    max_validation_idx = round(rows * val_pctg) + max_train_idx
+    MaxTrainidx = round(rows * train_pctg)
+    MaxValidationidx = round(rows * val_pctg) + MaxTrainidx
 
-    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
-    df.sort_values('Timestamp', inplace = True)
+    data = df.sort_values('Timestamp').iloc[:, 1:]
 
-    train = df[:max_train_idx]
-    val = df[max_train_idx:max_validation_idx]
-    test = df[max_validation_idx:]
+    train = data[:MaxTrainidx]
+    val = data[MaxTrainidx:MaxValidationidx]
+    test = data[MaxValidationidx:]
 
     print(f"""
           Completed train val test split 

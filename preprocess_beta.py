@@ -62,7 +62,9 @@ class Dataset:
             Val data : {df[max_train_idx:max_validation_idx].shape}
             Test data {df[max_validation_idx:].shape}\n """)
 
-        self.train, self.val, self.test = df[:max_train_idx], df[max_train_idx:max_validation_idx], df[max_validation_idx:]
+        self.train, self.val, self.test = (
+            df[:max_train_idx].copy(), df[max_train_idx:max_validation_idx].copy(), df[max_validation_idx:].copy()
+            )
 
     def clean_train_val_test(self):
         """Drop all null rows"""

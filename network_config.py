@@ -9,17 +9,17 @@ import torch
 # Define model architecture
 
 
-def generateANN(D_in, D_out=1):
+def generateANN(D_in, D_out= 1):
     H = D_in
 
     model = torch.nn.Sequential(
-        torch.nn.Linear(D_in, H),
+        torch.nn.Linear(D_in, 50),
         torch.nn.ReLU(),
-        torch.nn.Linear(D_in, H),
+        torch.nn.Linear(50, 35),
         torch.nn.ReLU(),
-        torch.nn.Linear(D_in, H),
+        torch.nn.Linear(35, 20),
         torch.nn.ReLU(),
-        torch.nn.Linear(H, D_out),
+        torch.nn.Linear(20, D_out),
     )
     return model
 
@@ -35,5 +35,4 @@ num_epochs = 10000
 def loss_fn(ypred,y):
     return torch.mean((ypred-y)**2)
 
-# def loss_fn(ypred, y):
-#     return (ypred - y).pow(2).mean()
+# loss_fn = torch.nn.MSELoss(reduction='sum')
