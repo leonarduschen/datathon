@@ -6,37 +6,40 @@ This is a temporary script file.
 """
 import torch
 import datetime
+import pandas as pd
 
 
 def preprocess(df, train_pctg=0.8, val_pctg=0.1, test_pctg=0.1):
-    df['Energy'] = df['Energy'].apply(
-        lambda x: df[df['Energy'] != 0]['Energy'].mean() if x == 0 else x)
-    data = dict()
-    data['train'], data['val'], data['test'] = train_val_test_split(df)
+    df_dict = dict()
+    dataloader_dict = dict()
 
-    dataloader = dict()
-    for key in data.keys():
-        tensor_data = torch.from_numpy(data[key].values)
+    df.drop(['Timestamp'], inplace = True, axis = 1)
+    
+    df_dict['train'], df_dict['val'], df_dict['test'] = train_val_test_split(
+        df, train_pctg, val_pctg, test_pctg)
+
+    
+    
+    for key in df_dict.keys():
+        tensor_data = torch.from_numpy(df_dict[key].values)
         Y = tensor_data[:, 0]
         X = tensor_data[:, 1:]
-        dataloader[key] = (X, Y)
+        dataloader_dict[key] = (X, Y)
 
-    return dataloader
+    return dataloader_dict
 
 
-def train_val_test_split(df, train_pctg=0.8, val_pctg=0.1, test_pctg=0.1):
-    df['Timestamp'] = df['Timestamp'].apply(
-        lambda x: datetime.datetime.strptime(x, '%d/%m/%Y %H:%S'))
-
+def train_val_test_split(df, train_pctg, val_pctg, test_pctg):
     rows = df.shape[0]
-    MaxTrainidx = round(rows * train_pctg)
-    MaxValidationidx = round(rows * val_pctg) + MaxTrainidx
+    max_train_idx = round(rows * train_pctg)
+    max_validation_idx = round(rows * val_pctg) + max_train_idx
 
-    data = df.sort_values('Timestamp').iloc[:, 1:]
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+    df.sort_values('Timestamp', inplace = True)
 
-    train = data[:MaxTrainidx]
-    val = data[MaxTrainidx:MaxValidationidx]
-    test = data[MaxValidationidx:]
+    train = df[:max_train_idx]
+    val = df[max_train_idx:max_validation_idx]
+    test = df[max_validation_idx:]
 
     print(f"""
           Completed train val test split 
