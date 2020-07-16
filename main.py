@@ -1,8 +1,11 @@
 import pandas as pd
 import torch
+from sklearn.preprocessing import StandardScaler
 
-from network_config import generateANN, optimizer, learning_rate, num_epochs, loss_fn
-from train_network import train_model, plot_loss
+from network_config import (
+    generateANN, optimizer, learning_rate, num_epochs, loss_fn
+)
+from train_network import train_model
 from test_model import test_model_loss
 from baseline_model import baseline_model_loss
 from preprocess import Dataset
@@ -16,27 +19,29 @@ if __name__ == '__main__':
         device = torch.device("cpu")
         print("Running on the CPU")
 
-    #Load
+    # Load
     df = pd.read_csv('./rawdata/consolidated_autocaffe_data.csv')
-    
-    #Generate Features
-    dataset = Dataset(df, lags_period = [1,23], lags_columns = ['speed-guitrancourt', 'speed-lieusaint',
-       'speed-lvs-pussay', 'speed-parc-du-gatinais', 'speed-arville',
-       'speed-boissy-la-riviere', 'speed-angerville-1', 'speed-angerville-2', 'speed-guitrancourt-b', 'speed-lieusaint-b',
-       'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b', 'speed-arville-b',
-       'speed-boissy-la-riviere-b', 'speed-angerville-1-b',
-       'speed-angerville-2-b'])
-    
-    #Aggregate all features, split, clean
+
+    # Generate Features
+    dataset = Dataset(df, lags_period=[1, 23], lags_columns=[
+        'speed-guitrancourt', 'speed-lieusaint', 'speed-lvs-pussay',
+        'speed-parc-du-gatinais', 'speed-arville', 'speed-boissy-la-riviere',
+        'speed-angerville-1', 'speed-angerville-2', 'speed-guitrancourt-b',
+        'speed-lieusaint-b', 'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b',
+        'speed-arville-b', 'speed-boissy-la-riviere-b', 'speed-angerville-1-b',
+        'speed-angerville-2-b'
+        ])
+
+    # Aggregate all features, split, clean
     dataset.generate_final_dataset()
     dataset.train_val_test_split(dataset.final_df, 0.8, 0.1, 0.1)
     dataset.clean_train_val_test()
+    dataset.scale_train_val_test(scaler=StandardScaler())
     print(dataset.train.columns)
-    
-    #Load to torch
-    data = dataset.load_data(drop_timestamp = True)
-    print('load successful')
-    
+
+    # Load to torch
+    data = dataset.load_data(drop_timestamp=True)
+    print('Load successful')
 
     # GENERATE NETWORK
     features = data['train'][0].shape[1]

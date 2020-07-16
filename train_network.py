@@ -31,8 +31,6 @@ class EarlyStopping:
             self.save_checkpoint(val_loss, model)
         elif score < self.best_score:
             self.counter += 1
-            # print(
-            #     f'EarlyStopping counter: {self.counter} out of {self.patience}')
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
@@ -42,9 +40,6 @@ class EarlyStopping:
 
     def save_checkpoint(self, val_loss, model):
         '''Saves model when validation loss decrease.'''
-        # if self.verbose:
-        #     print(
-        #         f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ...')
         torch.save(model.state_dict(), 'checkpoint.pt')
         self.val_loss_min = val_loss
 
@@ -58,13 +53,14 @@ def plot_loss(trainLoss, valLoss):
     plt.pause(0.0001)
 
 
-def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000, earlystoppingPatience=10, device=torch.device("cpu")):
+def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,
+                earlystoppingPatience=10, device=torch.device("cpu")):
     start_time = time.time()
 
     loss_dict = defaultdict(list)
 
     early_stopping = EarlyStopping(
-        patience=earlystoppingPatience, verbose=True)
+        patience=earlystoppingPatience, verbose=False)
 
     for epoch in range(num_epochs):
         # Each epoch has a training and validation phase
@@ -96,22 +92,23 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000, earl
                     optimizer.step()
 
             epoch_loss = loss.item()
-            
+
             loss_dict[phase].append(epoch_loss)
-            
-            #Print
-            if (epoch%100) == 0:
-                print(f'Epoch {epoch}/{num_epochs - 1}')
-                print('-' * 10)
-                print('{} Loss: {:.4f}'.format(phase, epoch_loss))
+
+            # Print
+            if (epoch % 100) == 99:
+                if phase == 'train':
+                    print(f'\nEpoch {epoch + 1}/{num_epochs}')
+                    print('-' * 10)
+                print('{} Loss: {:.4f}'.format(phase.capitalize(), epoch_loss))
 
             # Check for early stopping condition during validation
             if phase == 'val':
                 early_stopping(epoch_loss, model)
 
-        #plot_loss(trainLoss=loss_dict['train'], valLoss=loss_dict['val'])
+        # plot_loss(trainLoss=loss_dict['train'], valLoss=loss_dict['val'])
         if early_stopping.early_stop:
-            print(f"Early stopping at {epoch}")
+            print(f"Early stopping at {epoch + 1}")
             print('-' * 10)
             print('{} Loss: {:.4f}'.format(phase, epoch_loss))
             break
