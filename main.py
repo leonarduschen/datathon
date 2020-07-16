@@ -10,10 +10,12 @@ from network_config import (
     loss_fn,
     Layer
 )
-from train_network import train_model
-from test_model import test_model_loss
-from baseline_model import baseline_model_loss
 from preprocess import Dataset
+from train_network import train_model
+from eval_model import (
+    model_loss,
+    baseline_model_loss
+)
 
 
 cols = ['speed-guitrancourt', 'speed-lieusaint', 'speed-lvs-pussay',
@@ -81,8 +83,11 @@ if __name__ == '__main__':
                                 num_epochs=num_epochs, device=device)
 
     # TEST MODEL
-    baseline_loss = baseline_model_loss(data, loss_fn)
-    print("Base model loss on test dataset : ", baseline_loss)
+    print('\nResults\n----------')
+    for phase in ['train', 'val', 'test']:
+        baseline_loss = baseline_model_loss(data[phase], loss_fn)
+        print(f"Base model loss on {phase} dataset : {baseline_loss:.4f}")
 
-    ann_loss = test_model_loss(network, data, loss_fn, device)
-    print("Network loss on test dataset : ", ann_loss)
+    for phase in ['train', 'val', 'test']:
+        ann_loss = model_loss(network, data[phase], loss_fn, device)
+        print(f"Network loss on {phase} dataset : {ann_loss:.4f}")
