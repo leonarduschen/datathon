@@ -1,10 +1,10 @@
+import pandas as pd
+import torch
+
 from network_config import generateANN, optimizer, learning_rate, num_epochs, loss_fn
 from train_network import train_model, plot_loss
 from test_model import test_model_loss
 from baseline_model import baseline_model_loss
-import pandas as pd
-import torch
-
 from preprocess import Dataset
 
 if __name__ == '__main__':
@@ -16,13 +16,16 @@ if __name__ == '__main__':
         device = torch.device("cpu")
         print("Running on the CPU")
 
-    # PREPROCESS DATA
-
-    #Load and generate features
+    #Load
     df = pd.read_csv('./rawdata/consolidated_autocaffe_data.csv')
-    dataset = Dataset(df, lags_period = [1], lags_columns = ['speed-guitrancourt', 'speed-lieusaint',
+    
+    #Generate Features
+    dataset = Dataset(df, lags_period = [1,23], lags_columns = ['speed-guitrancourt', 'speed-lieusaint',
        'speed-lvs-pussay', 'speed-parc-du-gatinais', 'speed-arville',
-       'speed-boissy-la-riviere', 'speed-angerville-1', 'speed-angerville-2'])
+       'speed-boissy-la-riviere', 'speed-angerville-1', 'speed-angerville-2', 'speed-guitrancourt-b', 'speed-lieusaint-b',
+       'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b', 'speed-arville-b',
+       'speed-boissy-la-riviere-b', 'speed-angerville-1-b',
+       'speed-angerville-2-b'])
     
     #Aggregate all features, split, clean
     dataset.generate_final_dataset()
@@ -39,7 +42,7 @@ if __name__ == '__main__':
     features = data['train'][0].shape[1]
     network = generateANN(features).to(device)
     newoptimizer = optimizer(network.parameters(),
-                             lr=learning_rate, weight_decay=1e-5)
+                             lr=learning_rate, weight_decay=1)
 
     # TRAIN NETWORK
     network, loss = train_model(network, data, criterion=loss_fn, optimizer=newoptimizer,

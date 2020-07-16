@@ -1,17 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jul 11 02:24:24 2020
-
-@author: dandy
-"""
 import matplotlib.pyplot as plt
 from collections import defaultdict
 import numpy as np
 import time
 import torch
-
-# Stolen from https://github.com/Bjarten/early-stopping-pytorch
-
 
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""
@@ -40,8 +31,8 @@ class EarlyStopping:
             self.save_checkpoint(val_loss, model)
         elif score < self.best_score:
             self.counter += 1
-            print(
-                f'EarlyStopping counter: {self.counter} out of {self.patience}')
+            # print(
+            #     f'EarlyStopping counter: {self.counter} out of {self.patience}')
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
@@ -51,9 +42,9 @@ class EarlyStopping:
 
     def save_checkpoint(self, val_loss, model):
         '''Saves model when validation loss decrease.'''
-        if self.verbose:
-            print(
-                f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ...')
+        # if self.verbose:
+        #     print(
+        #         f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ...')
         torch.save(model.state_dict(), 'checkpoint.pt')
         self.val_loss_min = val_loss
 
@@ -76,9 +67,6 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000, earl
         patience=earlystoppingPatience, verbose=True)
 
     for epoch in range(num_epochs):
-        print(f'Epoch {epoch}/{num_epochs - 1}')
-        print('-' * 10)
-
         # Each epoch has a training and validation phase
         phases = ['train', 'val']
         for phase in phases:
@@ -108,9 +96,14 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000, earl
                     optimizer.step()
 
             epoch_loss = loss.item()
+            
             loss_dict[phase].append(epoch_loss)
-
-            print('{} Loss: {:.4f}'.format(phase, epoch_loss))
+            
+            #Print
+            if (epoch%100) == 0:
+                print(f'Epoch {epoch}/{num_epochs - 1}')
+                print('-' * 10)
+                print('{} Loss: {:.4f}'.format(phase, epoch_loss))
 
             # Check for early stopping condition during validation
             if phase == 'val':
@@ -118,7 +111,9 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000, earl
 
         #plot_loss(trainLoss=loss_dict['train'], valLoss=loss_dict['val'])
         if early_stopping.early_stop:
-            print("Early stopping")
+            print(f"Early stopping at {epoch}")
+            print('-' * 10)
+            print('{} Loss: {:.4f}'.format(phase, epoch_loss))
             break
 
     time_elapsed = time.time() - start_time

@@ -49,7 +49,7 @@ class Dataset:
         print("All features combined")
 
     def train_val_test_split(self, df, train_pctg, val_pctg, test_pctg):
-        """Split and store in self.train, self.val, self.test"""
+        """Split and store dataframe in self.train, self.val, self.test"""
 
         rows = df.shape[0]
         max_train_idx = round(rows * train_pctg)

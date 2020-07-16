@@ -33,6 +33,6 @@ num_epochs = 10000
 
 # Define loss criterion
 def loss_fn(ypred,y):
-    return torch.mean((ypred-y)**2)
+    return torch.mean((ypred-y)**2)/1000
 
 # loss_fn = torch.nn.MSELoss(reduction='sum')
