@@ -75,8 +75,8 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,
 
             # Load data
             inputs, labels = dataloaders[phase]
-            inputs = inputs.to(device)
-            labels = labels.to(device)
+            inputs = inputs
+            labels = labels
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -86,7 +86,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,
             with torch.set_grad_enabled(phase == 'train'):
                 # Get model prediction and calculate loss
                 preds = model(inputs.float())
-                loss = criterion(ypred=preds, y=labels.view(-1, 1))
+                loss = criterion(ypred=preds, y=labels)
 
                 # Back propagation + optimize only if in training phase
                 if phase == 'train':
@@ -98,7 +98,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,
             loss_dict[phase].append(epoch_loss)
 
             # Print
-            if (epoch % 100) == 99:
+            if True:
                 if phase == 'train':
                     print(f'\nEpoch {epoch + 1}/{num_epochs}')
                     print('-' * 10)

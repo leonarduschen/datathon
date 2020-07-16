@@ -23,24 +23,20 @@ cols = ['speed-guitrancourt', 'speed-lieusaint', 'speed-lvs-pussay',
         'speed-angerville-1', 'speed-angerville-2', 'speed-guitrancourt-b',
         'speed-lieusaint-b', 'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b',
         'speed-arville-b', 'speed-boissy-la-riviere-b', 'speed-angerville-1-b',
-        'speed-angerville-2-b', 'Energy']
+        'speed-angerville-2-b']
 
-feature_kwargs = {'lags_period': [0, 1, 2],
-                  'lags_columns': cols,
-                  'SMA_windows': [3, 12, 48],
-                  'SMA_columns': cols,
-                  'SMSTD_windows': [6, 24, 72],
-                  'SMSTD_columns': cols}
+feature_kwargs = {'lags_period': [1],
+                  'lags_columns': cols,}
 
 split_kwargs = {'train_pctg': 0.8,
                 'val_pctg': 0.1,
                 'test_pctg': 0.1}
 
 constructor = (
-    Layer('Linear', None, 128, 'ReLU'),
-    Layer('Linear', 128, 64, 'ReLU'),
+    Layer('Linear', None, 64, 'ReLU'),
     Layer('Linear', 64, 32, 'ReLU'),
-    Layer('Linear', 32, 1, None)
+    Layer('Linear', 32, 16, 'ReLU'),
+    Layer('Linear', 16, 1, None)
 )
 
 if __name__ == '__main__':
@@ -62,11 +58,10 @@ if __name__ == '__main__':
     dataset.generate_final_dataset()
     dataset.train_val_test_split(dataset.final_df, **split_kwargs)
     dataset.clean_train_val_test()
-    dataset.scale_train_val_test(scaler=StandardScaler())
     print(dataset.train.columns)
 
     # Load to torch
-    data = dataset.load_data(drop_timestamp=True)
+    data = dataset.load_data(device = device, drop_timestamp=True)
     print('Load successful')
 
     # GENERATE NETWORK
@@ -84,10 +79,15 @@ if __name__ == '__main__':
 
     # TEST MODEL
     print('\nResults\n----------')
+    for phase in ['train','val','test']:
+        ann_loss = model_loss(network, data[phase], loss_fn, device)
+        print(f"Network loss on {phase} dataset : {ann_loss:.4f}")
+    
+    print('\nResults\n----------')
     for phase in ['train', 'val', 'test']:
         baseline_loss = baseline_model_loss(data[phase], loss_fn)
         print(f"Base model loss on {phase} dataset : {baseline_loss:.4f}")
 
-    for phase in ['train', 'val', 'test']:
-        ann_loss = model_loss(network, data[phase], loss_fn, device)
-        print(f"Network loss on {phase} dataset : {ann_loss:.4f}")
+
+    
+

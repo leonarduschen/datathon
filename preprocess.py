@@ -94,7 +94,7 @@ class Dataset:
         self.test.iloc[:, 2:] = scaler.transform(self.test.iloc[:, 2:])
         print('Scaling successful.')
 
-    def load_data(self, drop_timestamp=True):
+    def load_data(self, device, drop_timestamp=True):
         """Data loader for NN"""
         dataloader_dict = dict()
 
@@ -108,9 +108,9 @@ class Dataset:
                                self.val.values,
                                self.test.values]):
             tensor_data = torch.from_numpy(value)
-            Y = tensor_data[:, 0]
+            Y = tensor_data[:, 0].view(-1,1)
             X = tensor_data[:, 1:]
-            dataloader_dict[key] = (X, Y)
+            dataloader_dict[key] = (X.to(device), Y.to(device))
 
         return dataloader_dict
 

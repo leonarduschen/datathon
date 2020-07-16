@@ -1,7 +1,5 @@
 def model_loss(model, data, criterion, device):
     inputs, labels = data
-    inputs = inputs.to(device)
-    labels = labels.to(device)
     preds = model(inputs.float())
     loss = criterion(preds, labels).item()
     return loss
