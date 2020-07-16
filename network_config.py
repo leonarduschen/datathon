@@ -6,6 +6,7 @@ Created on Sat Jul 11 02:24:04 2020
 """
 import yaml
 import torch
+from collections import namedtuple
 
 with open('config.yml', 'r') as file:
     config = yaml.load(file)
@@ -13,17 +14,31 @@ with open('config.yml', 'r') as file:
 # Define model architecture
 
 
-def generateANN(D_in, D_out=1):
-    model = torch.nn.Sequential(
-        torch.nn.Linear(D_in, 50),
-        torch.nn.ReLU(),
-        torch.nn.Linear(50, 35),
-        torch.nn.ReLU(),
-        torch.nn.Linear(35, 20),
-        torch.nn.ReLU(),
-        torch.nn.Linear(20, D_out),
-    )
+def generateANN(constructor, input_shape):
+    layers = list()
+    initial_layer = True
+    for c in constructor:
+        # If initial layer follow shape of input
+        if initial_layer:
+            combiner = getattr(torch.nn, c.combiner)(input_shape, c.shape_out)
+            initial_layer = False
+        else:
+            combiner = getattr(torch.nn, c.combiner)(c.shape_in, c.shape_out)
+        # Activation function
+        if c.activation:
+            activation = getattr(torch.nn, c.activation)()
+            layers.extend([combiner, activation])
+        else:
+            layers.append(combiner)
+
+    model = torch.nn.Sequential(*layers)
     return model
+
+# Define loss criterion
+
+
+def loss_fn(ypred, y):
+    return torch.mean((ypred - y)**2)/1e3
 
 
 # Config
@@ -31,11 +46,8 @@ num_epochs = config['num_epochs']
 learning_rate = float(config['lr'])
 optimizer = getattr(torch.optim, config['optimizer'])
 
-
-# Define loss criterion
-
-
-def loss_fn(ypred, y):
-    return torch.mean((ypred - y)**2)/1000
-
-# loss_fn = torch.nn.MSELoss(reduction='sum')
+# NN constructor
+Layer = namedtuple('Layer', ['combiner',
+                             'shape_in',
+                             'shape_out',
+                             'activation'])

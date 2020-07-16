@@ -3,7 +3,12 @@ import torch
 from sklearn.preprocessing import StandardScaler
 
 from network_config import (
-    generateANN, optimizer, learning_rate, num_epochs, loss_fn
+    generateANN,
+    optimizer,
+    learning_rate,
+    num_epochs,
+    loss_fn,
+    Layer
 )
 from train_network import train_model
 from test_model import test_model_loss
@@ -22,15 +27,21 @@ if __name__ == '__main__':
     # Load
     df = pd.read_csv('./rawdata/consolidated_autocaffe_data.csv')
 
-    # Generate Features
-    dataset = Dataset(df, lags_period=[1, 23], lags_columns=[
+    cols = [
         'speed-guitrancourt', 'speed-lieusaint', 'speed-lvs-pussay',
         'speed-parc-du-gatinais', 'speed-arville', 'speed-boissy-la-riviere',
         'speed-angerville-1', 'speed-angerville-2', 'speed-guitrancourt-b',
         'speed-lieusaint-b', 'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b',
         'speed-arville-b', 'speed-boissy-la-riviere-b', 'speed-angerville-1-b',
         'speed-angerville-2-b'
-        ])
+        ]
+    # Generate Features
+    dataset = Dataset(
+        df,
+        lags_period=[1, 2, 3], lags_columns=cols,
+        SMA_windows=[3, 12, 48], SMA_columns=cols,
+        SMSTD_windows=[6, 24, 72], SMSTD_columns=cols
+        )
 
     # Aggregate all features, split, clean
     dataset.generate_final_dataset()
@@ -45,12 +56,22 @@ if __name__ == '__main__':
 
     # GENERATE NETWORK
     features = data['train'][0].shape[1]
-    network = generateANN(features).to(device)
+
+    constructor = (
+        Layer('Linear', None, 128, 'ReLU'),
+        Layer('Linear', 128, 64, 'ReLU'),
+        Layer('Linear', 64, 32, 'ReLU'),
+        Layer('Linear', 32, 1, None)
+    )
+
+    network = generateANN(constructor=constructor,
+                          input_shape=features).to(device)
     newoptimizer = optimizer(network.parameters(),
                              lr=learning_rate, weight_decay=1)
 
     # TRAIN NETWORK
-    network, loss = train_model(network, data, criterion=loss_fn, optimizer=newoptimizer,
+    network, loss = train_model(network, data, criterion=loss_fn,
+                                optimizer=newoptimizer,
                                 num_epochs=num_epochs, device=device)
 
     # TEST MODEL
