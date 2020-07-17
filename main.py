@@ -49,7 +49,7 @@ if __name__ == '__main__':
         print("Running on the CPU")
 
     # Load
-    df = pd.read_csv('./rawdata/consolidated_autocaffe_data.csv')
+    df = pd.read_csv('./rawdata/consolidated_autocaffe_data_shifted.csv')
 
     # Generate Features
     dataset = Dataset(df, **feature_kwargs)
