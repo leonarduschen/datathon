@@ -98,7 +98,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,
             loss_dict[phase].append(epoch_loss)
 
             # Print
-            if (epoch%100) == 0:
+            if (epoch % 100) == 99:
                 if phase == 'train':
                     print(f'\nEpoch {epoch + 1}/{num_epochs}')
                     print('-' * 10)

@@ -26,7 +26,7 @@ cols = ['speed-guitrancourt', 'speed-lieusaint', 'speed-lvs-pussay',
         'speed-angerville-2-b']
 
 feature_kwargs = {'lags_period': [1],
-                  'lags_columns': cols,}
+                  'lags_columns': cols}
 
 split_kwargs = {'train_pctg': 0.8,
                 'val_pctg': 0.1,
@@ -60,9 +60,9 @@ if __name__ == '__main__':
     dataset.clean_train_val_test()
     dataset.scale_train_val_test(StandardScaler())
     print(dataset.train.columns)
-    
+
     # Load to torch
-    data = dataset.load_data(device = device, drop_timestamp=True)
+    data = dataset.load_data(device=device, drop_timestamp=True)
     print('Load successful')
 
     # GENERATE NETWORK
@@ -80,10 +80,10 @@ if __name__ == '__main__':
 
     # TEST MODEL
     print('\nResults\n----------')
-    for phase in ['train','val','test']:
+    for phase in ['train', 'val', 'test']:
         ann_loss = model_loss(network, data[phase], loss_fn, device)
         print(f"Network loss on {phase} dataset : {ann_loss:.4f}")
-    
+
     print('\nResults\n----------')
     for phase in ['train', 'val', 'test']:
         baseline_loss = baseline_model_loss(data[phase], loss_fn)
