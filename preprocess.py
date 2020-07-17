@@ -157,3 +157,5 @@ class Dataset:
         print(f"EMA {windows} generated, size: {SMSTD_df.shape}")
 
         return SMSTD_df
+    
+    
