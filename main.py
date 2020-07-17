@@ -10,7 +10,7 @@ from network_config import (
     loss_fn,
     Layer
 )
-from preprocess import Dataset
+from Preprocess import Dataset
 from train_network import train_model
 from eval_model import (
     model_loss,
