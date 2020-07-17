@@ -24,6 +24,14 @@ class Dataset:
         self.SMA = None
         self.SMSTD = None
         self.diffs = None
+        
+        #Corrections to speed and direction
+        self.df.loc[df.Timestamp<'2017-08-01','speed-boissy-la-riviere'] = 0
+        self.df.loc[df.Timestamp<'2017-08-01','speed-boissy-la-riviere-b']=0
+        self.df.loc[df.Timestamp<'2019-07-02','speed-angerville-1']=0
+        self.df.loc[df.Timestamp<'2019-07-02','speed-angerville-2']=0
+        self.df.loc[df.Timestamp<'2019-07-02','speed-angerville-1-b']=0
+        self.df.loc[df.Timestamp<'2019-07-02','speed-angerville-2-b']=0
 
         if sort:
             'Sorted dataset by timestamp'
