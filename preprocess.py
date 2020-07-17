@@ -7,7 +7,8 @@ class Dataset:
                  lags_period=None, lags_columns=['Energy'],
                  EMA_spans=None, EMA_columns=['Energy'],
                  SMA_windows=None, SMA_columns=['Energy'],
-                 SMSTD_windows=None, SMSTD_columns=['Energy']):
+                 SMSTD_windows=None, SMSTD_columns=['Energy'],
+                 diffs_period = None, diffs_columns = ['Energy']):
 
         self.df = df
 
@@ -22,6 +23,7 @@ class Dataset:
         self.EMA = None
         self.SMA = None
         self.SMSTD = None
+        self.diffs = None
 
         if sort:
             'Sorted dataset by timestamp'
@@ -47,31 +49,38 @@ class Dataset:
             self.SMSTD = self.generate_SMA(self.df,
                                            windows=SMSTD_windows,
                                            columns=SMSTD_columns)
+        
+        if diffs_period:
+            self.diffs = self.generate_diffs(self.df,
+                                            diffs = diffs_period,
+                                            columns = diffs_columns)
 
     def generate_final_dataset(self):
         """Aggregate all features and store in self.final_df"""
 
         self.final_df = pd.concat([self.df, self.lags, self.EMA,
-                                   self.SMA, self.SMSTD], axis=1)
+                                   self.SMA, self.SMSTD, self.diffs], axis=1)
         print("All features combined")
 
-    def train_val_test_split(self, df, train_pctg, val_pctg, test_pctg):
+    def train_val_test_split(self, df, train_pctg, val_pctg, test_pctg, buffer_pctg = 0):  #ADDED BUFFER OPTION HERE!
         """Split and store dataframe in self.train, self.val, self.test"""
 
         rows = df.shape[0]
-        max_train_idx = round(rows * train_pctg)
+
+        max_buffer_idx = round(rows * buffer_pctg)
+        max_train_idx = round(rows * train_pctg) + max_buffer_idx
         max_validation_idx = round(rows * val_pctg) + max_train_idx
         print(f"""
             Completed train val test split
             -------------------------------
             Total data : {df.shape}
-            Train data : {df[:max_train_idx].shape}
-            Val data : {df[max_train_idx:max_validation_idx].shape}
+            Train data : {df[max_buffer_idx : max_train_idx].shape}
+            Val data : {df[max_train_idx : max_validation_idx].shape}
             Test data {df[max_validation_idx:].shape}\n """)
 
         self.train, self.val, self.test = (
-            df[:max_train_idx].copy(),
-            df[max_train_idx:max_validation_idx].copy(),
+            df[max_buffer_idx : max_train_idx].copy(),
+            df[max_train_idx : max_validation_idx].copy(),
             df[max_validation_idx:].copy()
         )
 
@@ -86,12 +95,18 @@ class Dataset:
             Test {self.test.shape},
             \n """)
 
-    def scale_train_val_test(self, scaler):
+    def scale_train_val_test(self, scaler, scale_prediction = False):
         """Scale datasets using transformer with fit_transform and
         transform method, avoid timestamp and target column"""
-        self.train.iloc[:, 2:] = scaler.fit_transform(self.train.iloc[:, 2:])
-        self.val.iloc[:, 2:] = scaler.transform(self.val.iloc[:, 2:])
-        self.test.iloc[:, 2:] = scaler.transform(self.test.iloc[:, 2:])
+
+        if scale_prediction:
+            col_position = 1
+        else:
+            col_position = 2
+
+        self.train.iloc[:, col_position:] = scaler.fit_transform(self.train.iloc[:, col_position:])
+        self.val.iloc[:, col_position:] = scaler.transform(self.val.iloc[:, col_position:])
+        self.test.iloc[:, col_position:] = scaler.transform(self.test.iloc[:, col_position:])
         print('Scaling successful.')
 
     def load_data(self, device, drop_timestamp=True):
@@ -157,3 +172,12 @@ class Dataset:
         print(f"EMA {windows} generated, size: {SMSTD_df.shape}")
 
         return SMSTD_df
+
+    def generate_diffs(self, df, diffs, columns):
+        diffs_df = pd.concat([self.df[columns].diff()
+                            for diff in diffs],
+                            axis = 1)
+        diffs_df.columns = [f'diff-{diff}-{col}' for col in columns
+                            for diff in diffs]
+        print(f"Differencings {diffs} generated, size : {diffs_df.shape}")
+    
