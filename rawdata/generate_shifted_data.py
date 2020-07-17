@@ -5,4 +5,5 @@ cols_to_shift = [col for col in df.columns if col not in ['Timestamp','Energy']]
 df[cols_to_shift] = df[cols_to_shift].shift(18)
 df.dropna(axis = 0, inplace = True)
 
+df = df.set_index('Timestamp')
 df.to_csv('.\\rawdata\\consolidated_autocaffe_data_shifted.csv')

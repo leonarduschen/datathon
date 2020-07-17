@@ -73,7 +73,7 @@ class Dataset:
             df[:max_train_idx].copy(),
             df[max_train_idx:max_validation_idx].copy(),
             df[max_validation_idx:].copy()
-            )
+        )
 
     def clean_train_val_test(self):
         """Drop all null rows"""
@@ -108,7 +108,7 @@ class Dataset:
                                self.val.values,
                                self.test.values]):
             tensor_data = torch.from_numpy(value)
-            Y = tensor_data[:, 0].view(-1,1)
+            Y = tensor_data[:, 0].view(-1, 1)
             X = tensor_data[:, 1:]
             dataloader_dict[key] = (X.to(device), Y.to(device))
 

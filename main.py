@@ -34,9 +34,9 @@ split_kwargs = {'train_pctg': 0.8,
 
 constructor = (
     Layer('Linear', None, 64, 'ReLU'),
+    Layer('Linear', 64, 64, 'ReLU'),
     Layer('Linear', 64, 32, 'ReLU'),
-    Layer('Linear', 32, 16, 'ReLU'),
-    Layer('Linear', 16, 1, None)
+    Layer('Linear', 32, 1, None)
 )
 
 if __name__ == '__main__':
@@ -58,8 +58,9 @@ if __name__ == '__main__':
     dataset.generate_final_dataset()
     dataset.train_val_test_split(dataset.final_df, **split_kwargs)
     dataset.clean_train_val_test()
+    dataset.scale_train_val_test(StandardScaler())
     print(dataset.train.columns)
-
+    
     # Load to torch
     data = dataset.load_data(device = device, drop_timestamp=True)
     print('Load successful')
@@ -87,7 +88,3 @@ if __name__ == '__main__':
     for phase in ['train', 'val', 'test']:
         baseline_loss = baseline_model_loss(data[phase], loss_fn)
         print(f"Base model loss on {phase} dataset : {baseline_loss:.4f}")
-
-
-    
-
