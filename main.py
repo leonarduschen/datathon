@@ -1,7 +1,7 @@
 import pandas as pd
 import torch
 from sklearn.preprocessing import StandardScaler
-
+from helper import save_result
 from network_config import (
     generateANN,
     optimizer,
@@ -39,6 +39,8 @@ constructor = (
     Layer('Linear', 32, 1, None)
 )
 
+    
+
 if __name__ == '__main__':
     if torch.cuda.is_available():
         # you can continue going on here, like cuda:1 cuda:2....etc.
@@ -47,7 +49,6 @@ if __name__ == '__main__':
     else:
         device = torch.device("cpu")
         print("Running on the CPU")
-
     # Load
     df = pd.read_csv('./rawdata/consolidated_autocaffe_data_shifted.csv')
 
@@ -88,3 +89,14 @@ if __name__ == '__main__':
     for phase in ['train', 'val', 'test']:
         baseline_loss = baseline_model_loss(data[phase], loss_fn)
         print(f"Base model loss on {phase} dataset : {baseline_loss:.4f}")
+    
+    save_result(folder ='TrainResult',
+                model = network,
+                train_loss = loss['train'],
+                val_loss = loss['val'],
+                cols = cols,
+                feature_kwargs = feature_kwargs,
+                feature_splits = split_kwargs,
+                optimizer =  newoptimizer,
+                test_loss = ann_loss,
+                baseline_test_loss = baseline_loss)
