@@ -7,11 +7,32 @@ Created on Sat Jul 11 02:24:04 2020
 import yaml
 import torch
 from collections import namedtuple
+from torch import nn
+
 
 # with open('config.yml', 'r') as file:
 #     config = yaml.safe_load(file)
 
 # Define model architecture
+
+
+class CustomNNSequential(nn.modules.container.Sequential):
+    def __init__(self,layers):
+        nn.modules.container.Sequential.__init__(self,*layers)
+   
+  
+    def forward(self, input):
+        for module in self: 
+            isLSTM = str(type(module)) == "<class 'torch.nn.modules.rnn.LSTM'>"
+            if isLSTM:
+                #In this case batch size is 1
+                input,_ = module(input.view(len(input),1,-1))
+            else:
+                input = module(input)
+        return input   z 
+     
+
+
 def generateANN(constructor, input_shape):
     layers = list()
     initial_layer = True
@@ -28,12 +49,14 @@ def generateANN(constructor, input_shape):
             layers.extend([combiner, activation])
         else:
             layers.append(combiner)
-
-    model = torch.nn.Sequential(*layers)
+    
+        model = CustomNNSequential(layers)
     return model
 
 # Define loss criterion
 loss_fn = torch.nn.L1Loss()
+
+
 
 # Config
 num_epochs = 10000

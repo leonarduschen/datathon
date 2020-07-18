@@ -30,7 +30,8 @@ split_kwargs = {'train_pctg': 0.8,
                 'test_pctg': 0.1}
 
 constructor = (
-    Layer('Linear', None, 64, 'ReLU'),
+    Layer('LSTM', None, 48, None),
+    Layer('Linear', 48, 64, 'ReLU'),
     Layer('Linear', 64, 64, 'ReLU'),
     Layer('Linear', 64, 32, 'ReLU'),
     Layer('Linear', 32, 1, None)
