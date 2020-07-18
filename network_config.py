@@ -29,7 +29,7 @@ class CustomNNSequential(nn.modules.container.Sequential):
                 input,_ = module(input.view(len(input),1,-1))
             else:
                 input = module(input)
-        return input   z 
+        return input
      
 
 
@@ -59,7 +59,7 @@ loss_fn = torch.nn.L1Loss()
 
 
 # Config
-num_epochs = 10000
+num_epochs = 50000
 learning_rate = 1e-5
 weight_decay = 0.1
 optimizer = getattr(torch.optim, 'Adam')
