@@ -16,6 +16,7 @@ def save_result(folder,*args,**kwargs):
     subfolder = modelID
     print(f"Saving model on ./{folder}/{subfolder}")
     subfolderPath = os.path.join(folder,subfolder)
+    
     #Create folder to save all files
     if not os.path.exists(folder):
         os.makedirs(folder) 
@@ -40,7 +41,7 @@ def save_result(folder,*args,**kwargs):
         
     # #Saving plot
     # train_loss = 'train_loss'
-    # val_loss='val_loss'
+    # val_loss= 'val_loss'
     # if train_loss in kwargs.keys() and val_loss in kwargs.keys():
     #     plotFilename = filename+'.png'
     #     plotFilepath = os.path.join(subfolderPath,plotFilename)

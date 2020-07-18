@@ -33,11 +33,11 @@ def generateANN(constructor, input_shape):
     return model
 
 # Define loss criterion
-loss_fn = torch.nn.MSELoss()
+loss_fn = torch.nn.L1Loss()
 
 # Config
 num_epochs = 10000
-learning_rate = 1e-5
+learning_rate = 1e-4
 weight_decay = 10
 optimizer = getattr(torch.optim, 'Adam')
 

@@ -81,7 +81,7 @@ if __name__ == '__main__':
     print('\nResults\n----------')
     model_results = dict()
     for phase in ['train', 'val', 'test']:
-        model_results[phase] = model_loss(network, data[phase], loss_fn, device)
+        model_results[phase] = model_loss(network, data[phase], loss_fn)
         print(f"Network loss on {phase} dataset : {model_results[phase]:.4f}")
 
     baseline_results = dict()
@@ -91,8 +91,8 @@ if __name__ == '__main__':
     
     save_result(folder ='train_result',
                 model = network,
-                train_loss = pd.array(loss['train']),
-                val_loss = pd.array(loss['val']),
+                train_loss = loss['train'],
+                val_loss = loss['val'],
                 cols = cols,
                 feature_kwargs = feature_kwargs,
                 feature_splits = split_kwargs,
