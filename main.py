@@ -46,8 +46,12 @@ if __name__ == '__main__':
     else:
         device = torch.device("cpu")
         print("Running on the CPU")
+    
     # Load
     df = pd.read_csv('./rawdata/consolidated_autocaffe_data_shifted.csv')
+    cols_to_drop = [col for col in df.columns if (col not in cols) & (col not in ['Energy','Timestamp'])]
+    df.drop(cols_to_drop, axis = 1, inplace = True)
+
     df['Energy'] = df['Energy']/1000
 
     # Generate Features
