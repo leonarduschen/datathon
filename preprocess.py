@@ -8,7 +8,8 @@ class Dataset:
                  EMA_spans=None, EMA_columns=['Energy'],
                  SMA_windows=None, SMA_columns=['Energy'],
                  SMSTD_windows=None, SMSTD_columns=['Energy'],
-                 diffs_period = None, diffs_columns = ['Energy']):
+                 diffs_period = None, diffs_columns = ['Energy'],
+                 energy_lags_period = None, energy_lags_columns=['Energy']):
 
         self.df = df
 
@@ -64,11 +65,17 @@ class Dataset:
                                             diffs = diffs_period,
                                             columns = diffs_columns)
 
+        if energy_lags_period:
+            self.energy_lags = self.generate_lag(self.df,
+                                                lags = energy_lags_period,
+                                                columns = energy_lags_columns)
+
     def generate_final_dataset(self):
         """Aggregate all features and store in self.final_df"""
 
         self.final_df = pd.concat([self.df, self.lags, self.EMA,
-                                   self.SMA, self.SMSTD, self.diffs], axis=1)
+                                   self.SMA, self.SMSTD, self.diffs,
+                                   self.energy_lags], axis=1)
         print("All features combined")
 
     def train_val_test_split(self, df, train_pctg, val_pctg, test_pctg, buffer_pctg = 0):  #ADDED BUFFER OPTION HERE!

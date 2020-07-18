@@ -30,8 +30,10 @@ to_scale_energy = True
 cols = ['speed-lvs-pussay', 'speed-parc-du-gatinais', 'speed-arville', 'speed-boissy-la-riviere', 'speed-angerville-1',
         'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b', 'speed-arville-b', 'speed-boissy-la-riviere-b', 'speed-angerville-1-b']
 
-feature_kwargs = {'lags_period': [5, 6, 7],
-                  'lags_columns': cols}
+feature_kwargs = {'lags_period': [1,3,23],
+                'lags_columns' : cols,
+                'energy_lags_period': [18,20,23,47],
+                'energy_lags_columns': ['Energy']}
 
 split_kwargs = {'train_pctg': 0.8,
                 'val_pctg': 0.1,
