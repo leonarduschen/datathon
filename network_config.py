@@ -8,12 +8,10 @@ import yaml
 import torch
 from collections import namedtuple
 
-with open('config.yml', 'r') as file:
-    config = yaml.safe_load(file)
+# with open('config.yml', 'r') as file:
+#     config = yaml.safe_load(file)
 
 # Define model architecture
-
-
 def generateANN(constructor, input_shape):
     layers = list()
     initial_layer = True
@@ -35,16 +33,13 @@ def generateANN(constructor, input_shape):
     return model
 
 # Define loss criterion
-
-
-def loss_fn(ypred, y):
-    return torch.mean((ypred - y)**2)/1e3
-
+loss_fn = torch.nn.MSELoss()
 
 # Config
-num_epochs = config['num_epochs']
-learning_rate = float(config['lr'])
-optimizer = getattr(torch.optim, config['optimizer'])
+num_epochs = 10000
+learning_rate = 1e-5
+weight_decay = 10
+optimizer = getattr(torch.optim, 'Adam')
 
 # NN constructor
 Layer = namedtuple('Layer', ['combiner',

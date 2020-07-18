@@ -8,9 +8,10 @@ from network_config import (
     learning_rate,
     num_epochs,
     loss_fn,
+    weight_decay,
     Layer
 )
-from Preprocess import Dataset
+from preprocess import Dataset
 from train_network import train_model
 from eval_model import (
     model_loss,
@@ -18,12 +19,8 @@ from eval_model import (
 )
 
 
-cols = ['speed-guitrancourt', 'speed-lieusaint', 'speed-lvs-pussay',
-        'speed-parc-du-gatinais', 'speed-arville', 'speed-boissy-la-riviere',
-        'speed-angerville-1', 'speed-angerville-2', 'speed-guitrancourt-b',
-        'speed-lieusaint-b', 'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b',
-        'speed-arville-b', 'speed-boissy-la-riviere-b', 'speed-angerville-1-b',
-        'speed-angerville-2-b']
+cols = ['speed-lvs-pussay', 'speed-parc-du-gatinais', 'speed-arville', 'speed-boissy-la-riviere', 'speed-angerville-1',
+        'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b', 'speed-arville-b', 'speed-boissy-la-riviere-b', 'speed-angerville-1-b']
 
 feature_kwargs = {'lags_period': [1],
                   'lags_columns': cols}
@@ -51,6 +48,7 @@ if __name__ == '__main__':
         print("Running on the CPU")
     # Load
     df = pd.read_csv('./rawdata/consolidated_autocaffe_data_shifted.csv')
+    df['Energy'] = df['Energy']/1000
 
     # Generate Features
     dataset = Dataset(df, **feature_kwargs)
@@ -72,7 +70,7 @@ if __name__ == '__main__':
     network = generateANN(constructor=constructor,
                           input_shape=features).to(device)
     newoptimizer = optimizer(network.parameters(),
-                             lr=learning_rate, weight_decay=1)
+                             lr=learning_rate, weight_decay=weight_decay)
 
     # TRAIN NETWORK
     network, loss = train_model(network, data, criterion=loss_fn,
@@ -81,22 +79,23 @@ if __name__ == '__main__':
 
     # TEST MODEL
     print('\nResults\n----------')
+    model_results = dict()
     for phase in ['train', 'val', 'test']:
-        ann_loss = model_loss(network, data[phase], loss_fn, device)
-        print(f"Network loss on {phase} dataset : {ann_loss:.4f}")
+        model_results[phase] = model_loss(network, data[phase], loss_fn, device)
+        print(f"Network loss on {phase} dataset : {model_results[phase]:.4f}")
 
-    print('\nResults\n----------')
+    baseline_results = dict()
     for phase in ['train', 'val', 'test']:
-        baseline_loss = baseline_model_loss(data[phase], loss_fn)
-        print(f"Base model loss on {phase} dataset : {baseline_loss:.4f}")
+        baseline_results[phase] = baseline_model_loss(data[phase], loss_fn)
+        print(f"Base model loss on {phase} dataset : {baseline_results[phase]:.4f}")
     
-    save_result(folder ='TrainResult',
+    save_result(folder ='train_result',
                 model = network,
-                train_loss = loss['train'],
-                val_loss = loss['val'],
+                train_loss = pd.array(loss['train']),
+                val_loss = pd.array(loss['val']),
                 cols = cols,
                 feature_kwargs = feature_kwargs,
                 feature_splits = split_kwargs,
                 optimizer =  newoptimizer,
-                test_loss = ann_loss,
-                baseline_test_loss = baseline_loss)
+                test_loss = model_results,
+                baseline_test_loss = baseline_results)

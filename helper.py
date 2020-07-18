@@ -38,18 +38,18 @@ def save_result(folder,*args,**kwargs):
             f.write(str(k) + ' >>> '+ str(v) + '\n\n')
         
         
-    #Saving plot
-    train_loss = 'train_loss'
-    val_loss='val_loss'
-    if train_loss in kwargs.keys() and val_loss in kwargs.keys():
-        plotFilename = filename+'.png'
-        plotFilepath = os.path.join(subfolderPath,plotFilename)
-        plt.plot(kwargs[train_loss])
-        plt.plot(kwargs[val_loss])
-        plt.title('Training vs Validation Loss')
-        plt.ylabel('loss')
-        plt.xlabel('epoch') 
-        plt.legend([train_loss, val_loss])  
-        plt.savefig(plotFilepath) 
-        plt.show()
-        plt.close()
+    # #Saving plot
+    # train_loss = 'train_loss'
+    # val_loss='val_loss'
+    # if train_loss in kwargs.keys() and val_loss in kwargs.keys():
+    #     plotFilename = filename+'.png'
+    #     plotFilepath = os.path.join(subfolderPath,plotFilename)
+    #     plt.plot(kwargs[train_loss])
+    #     plt.plot(kwargs[val_loss])
+    #     plt.title('Training vs Validation Loss')
+    #     plt.ylabel('loss')
+    #     plt.xlabel('epoch') 
+    #     plt.legend([train_loss, val_loss])  
+    #     plt.savefig(plotFilepath) 
+    #     plt.show()
+    #     plt.close()

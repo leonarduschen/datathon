@@ -1,0 +1,53 @@
+model >>> Sequential(
+  (0): Linear(in_features=48, out_features=64, bias=True)
+  (1): ReLU()
+  (2): Linear(in_features=64, out_features=64, bias=True)
+  (3): ReLU()
+  (4): Linear(in_features=64, out_features=32, bias=True)
+  (5): ReLU()
+  (6): Linear(in_features=32, out_features=1, bias=True)
+)
+
+train_loss >>> <PandasArray>
+[ 439.9954545034131,  439.8504319596126,  439.7051801179548,
+ 439.55999147833495, 439.41547688181385,  439.2730029627069,
+ 439.13313891504856,  438.9955094504049,  438.8597652231924,
+ 438.72543195176286,
+ ...
+ 223.49217749077252, 223.22180828571493, 222.94312821854453,
+  222.6617074144086, 222.38173186948427,   222.108976819472,
+ 221.84709792107202,  221.5979917245512, 221.36297371543654,
+ 221.14323867413657]
+Length: 162, dtype: float64
+
+val_loss >>> <PandasArray>
+[1904.3299207246323,  1903.899147150152, 1903.4675451233857,
+ 1903.0353263661405, 1902.6074133861928, 1902.1876984107578,
+  1901.776896921176,  1901.373847423241, 1900.9769177299418,
+ 1900.5841781620409,
+ ...
+  879.5386762817622,  880.3765515778827,  881.5684778815859,
+  883.0750607189102,  884.8476077045315,  886.8321975628871,
+  888.9699046854575,  891.2065679176702,   893.488816895024,
+  895.7684569946482]
+Length: 162, dtype: float64
+
+cols >>> ['speed-guitrancourt', 'speed-lieusaint', 'speed-lvs-pussay', 'speed-parc-du-gatinais', 'speed-arville', 'speed-boissy-la-riviere', 'speed-angerville-1', 'speed-angerville-2', 'speed-guitrancourt-b', 'speed-lieusaint-b', 'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b', 'speed-arville-b', 'speed-boissy-la-riviere-b', 'speed-angerville-1-b', 'speed-angerville-2-b']
+
+feature_kwargs >>> {'lags_period': [1], 'lags_columns': ['speed-guitrancourt', 'speed-lieusaint', 'speed-lvs-pussay', 'speed-parc-du-gatinais', 'speed-arville', 'speed-boissy-la-riviere', 'speed-angerville-1', 'speed-angerville-2', 'speed-guitrancourt-b', 'speed-lieusaint-b', 'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b', 'speed-arville-b', 'speed-boissy-la-riviere-b', 'speed-angerville-1-b', 'speed-angerville-2-b']}
+
+feature_splits >>> {'train_pctg': 0.8, 'val_pctg': 0.1, 'test_pctg': 0.1}
+
+optimizer >>> Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.0003
+    weight_decay: 1
+)
+
+test_loss >>> {'train': 223.49217749077252, 'val': 879.1094989357412, 'test': 679.9006300149335}
+
+baseline_test_loss >>> {'train': 307.3342737292123, 'val': 761.2372284188859, 'test': 798.8940368904059}
+

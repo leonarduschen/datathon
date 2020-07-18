@@ -1,3 +1,0 @@
-lr: 3e-4
-optimizer: Adam
-num_epochs: 10000
