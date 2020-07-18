@@ -19,6 +19,14 @@ from eval_model import (
 )
 
 torch.cuda.empty_cache()
+
+#For energy scaling
+scaling_mean = 0
+scaling_numerator = 1000
+to_scale_energy = True
+
+
+
 cols = ['speed-lvs-pussay', 'speed-parc-du-gatinais', 'speed-arville', 'speed-boissy-la-riviere', 'speed-angerville-1',
         'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b', 'speed-arville-b', 'speed-boissy-la-riviere-b', 'speed-angerville-1-b']
 
@@ -37,6 +45,8 @@ constructor = (
     Layer('Linear', 16, 1, None)
 )
 
+
+
     
 
 if __name__ == '__main__':
@@ -51,9 +61,12 @@ if __name__ == '__main__':
     # Load
     df = pd.read_csv('./rawdata/consolidated_autocaffe_data_shifted.csv')
     cols_to_drop = [col for col in df.columns if (col not in cols) & (col not in ['Energy','Timestamp'])]
-    df.drop(cols_to_drop, axis = 1, inplace = True)
+    df.drop(cols_to_drop, axis = 1, inplace = True)  
+    
+    #ENERGY SCALING
+    if to_scale_energy:
+        df['Energy'] = (df['Energy'] - scaling_mean)/scaling_numerator
 
-    df['Energy'] = df['Energy']/1000
 
     # Generate Features
     dataset = Dataset(df, **feature_kwargs)
@@ -69,7 +82,7 @@ if __name__ == '__main__':
     data = dataset.load_data(device=device, drop_timestamp=True)
     print('Load successful')
 
-    # GENERATE NETWORK
+    # Generate Network
     features = data['train'][0].shape[1]
 
     network = generateANN(constructor=constructor,
@@ -77,22 +90,36 @@ if __name__ == '__main__':
     newoptimizer = optimizer(network.parameters(),
                              lr=learning_rate, weight_decay=weight_decay)
 
-    # TRAIN NETWORK
+    # Train Network
     network, loss = train_model(network, data, criterion=loss_fn,
                                 optimizer=newoptimizer,
                                 num_epochs=num_epochs, device=device)
 
-    # TEST MODEL
+    # Test Model
     print('\nResults\n----------')
-    model_results = dict()
-    for phase in ['train', 'val', 'test']:
-        model_results[phase] = model_loss(network, data[phase], loss_fn)
-        print(f"Network loss on {phase} dataset : {model_results[phase]:.4f}")
+    if to_scale_energy:
+        print(f'Error already multiplied by {scaling_numerator}')
+        model_results = dict()
+        for phase in ['train', 'val', 'test']:
+            model_results[phase] = model_loss(network, data[phase], loss_fn) * scaling_numerator
+            print(f"Network loss on {phase} dataset : {model_results[phase]:.4f}")
 
-    baseline_results = dict()
-    for phase in ['train', 'val', 'test']:
-        baseline_results[phase] = baseline_model_loss(data[phase], loss_fn)
-        print(f"Base model loss on {phase} dataset : {baseline_results[phase]:.4f}")
+        baseline_results = dict()
+        for phase in ['train', 'val', 'test']:
+            baseline_results[phase] = baseline_model_loss(data[phase], loss_fn) * scaling_numerator
+            print(f"Base model loss on {phase} dataset : {baseline_results[phase]:.4f}")
+    
+    else:
+        model_results = dict()
+        for phase in ['train', 'val', 'test']:
+            model_results[phase] = model_loss(network, data[phase], loss_fn)
+            print(f"Network loss on {phase} dataset : {model_results[phase]:.4f}")
+
+        baseline_results = dict()
+        for phase in ['train', 'val', 'test']:
+            baseline_results[phase] = baseline_model_loss(data[phase], loss_fn)
+            print(f"Base model loss on {phase} dataset : {baseline_results[phase]:.4f}")
+    
     
     # save_result(folder ='train_result',
     #             model = network,

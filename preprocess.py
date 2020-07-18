@@ -3,7 +3,7 @@ import pandas as pd
 
 
 class Dataset:
-    def __init__(self, df, sort=True,fixwindspeed=False,
+    def __init__(self, df, sort=True, dayfirst = True, fixwindspeed=False,
                  lags_period=None, lags_columns=['Energy'],
                  EMA_spans=None, EMA_columns=['Energy'],
                  SMA_windows=None, SMA_columns=['Energy'],
@@ -36,7 +36,7 @@ class Dataset:
 
         if sort:
             'Sorted dataset by timestamp'
-            self.df['Timestamp'] = pd.to_datetime(self.df['Timestamp'])
+            self.df['Timestamp'] = pd.to_datetime(self.df['Timestamp'], dayfirst = dayfirst)
             self.df.sort_values('Timestamp', inplace=True)
 
         if lags_period:
