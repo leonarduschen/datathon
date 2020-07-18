@@ -61,7 +61,7 @@ loss_fn = torch.nn.L1Loss()
 # Config
 num_epochs = 50000
 learning_rate = 1e-5
-weight_decay = 0.1
+weight_decay = 0.01
 optimizer = getattr(torch.optim, 'Adam')
 
 # NN constructor

@@ -9,7 +9,8 @@ class Dataset:
                  SMA_windows=None, SMA_columns=['Energy'],
                  SMSTD_windows=None, SMSTD_columns=['Energy'],
                  diffs_period = None, diffs_columns = ['Energy'],
-                 energy_lags_period = None, energy_lags_columns=['Energy']):
+                 energy_lags_period = None, energy_lags_columns=['Energy'],
+                 month_encode = None, year_encode = None):
 
         self.df = df
 
@@ -25,6 +26,8 @@ class Dataset:
         self.SMA = None
         self.SMSTD = None
         self.diffs = None
+        self.month = None
+        self.year = None
         
         #Corrections to speed and direction
         if fixwindspeed:
@@ -69,16 +72,20 @@ class Dataset:
             self.energy_lags = self.generate_lag(self.df,
                                                 lags = energy_lags_period,
                                                 columns = energy_lags_columns)
-
+        if month_encode:
+            self.month = self.generate_month_one_hot(df)
+            
+        if year_encode:
+            self.year = self.generate_year_one_hot(df)
     def generate_final_dataset(self):
         """Aggregate all features and store in self.final_df"""
 
         self.final_df = pd.concat([self.df, self.lags, self.EMA,
                                    self.SMA, self.SMSTD, self.diffs,
-                                   self.energy_lags], axis=1)
+                                   self.energy_lags,self.month,self.year], axis=1)
         print("All features combined")
 
-    def train_val_test_split(self, df, train_pctg, val_pctg, test_pctg, buffer_pctg = 0):  #ADDED BUFFER OPTION HERE!
+    def train_val_test_split(self, df, train_pctg, val_pctg, test_pctg, buffer_pctg = 0,*args,**kwargs):  #ADDED BUFFER OPTION HERE!
         """Split and store dataframe in self.train, self.val, self.test"""
 
         rows = df.shape[0]
@@ -86,6 +93,7 @@ class Dataset:
         max_buffer_idx = round(rows * buffer_pctg)
         max_train_idx = round(rows * train_pctg) + max_buffer_idx
         max_validation_idx = round(rows * val_pctg) + max_train_idx
+        max_test_idx = round(rows *test_pctg) + max_validation_idx
         print(f"""
             Completed train val test split
             -------------------------------
@@ -97,7 +105,7 @@ class Dataset:
         self.train, self.val, self.test = (
             df[max_buffer_idx : max_train_idx].copy(),
             df[max_train_idx : max_validation_idx].copy(),
-            df[max_validation_idx:].copy()
+            df[max_validation_idx : max_test_idx].copy()
         )
 
     def clean_train_val_test(self):
@@ -197,3 +205,10 @@ class Dataset:
                             for diff in diffs]
         print(f"Differencings {diffs} generated, size : {diffs_df.shape}")
     
+    def generate_month_one_hot(self,df):
+        month_df = pd.get_dummies(df.Timestamp.apply(lambda x: x.month))
+        return month_df
+    
+    def generate_year_one_hot(self,df):
+        year_df = pd.get_dummies(df.Timestamp.apply(lambda x: x.year))
+        return year_df

@@ -55,7 +55,7 @@ def plot_loss(trainLoss, valLoss):
     plt.pause(0.0001)
 
 
-def train_model(model, dataloaders, criterion, optimizer, batch_size=64, num_epochs=10000,
+def train_model(model, dataloaders, criterion, optimizer, K,batch_size=64, num_epochs=10000,
                 earlystoppingPatience=10, device=torch.device("cpu")):
     start_time = time.time()
 
@@ -105,7 +105,7 @@ def train_model(model, dataloaders, criterion, optimizer, batch_size=64, num_epo
             # Print
             if (epoch % 100) == 99:
                 if phase == 'train':
-                    print(f'\nEpoch {epoch + 1}/{num_epochs}')
+                    print(f'\nEpoch {epoch + 1}/{num_epochs}  || K : {K}')
                     print('-' * 10)
                 print('{} Loss: {:.4f}'.format(phase.capitalize(), epoch_loss))
 
