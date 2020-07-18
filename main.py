@@ -30,24 +30,21 @@ to_scale_energy = True
 cols = ['speed-lvs-pussay', 'speed-parc-du-gatinais', 'speed-arville', 'speed-boissy-la-riviere', 'speed-angerville-1',
         'speed-lvs-pussay-b', 'speed-parc-du-gatinais-b', 'speed-arville-b', 'speed-boissy-la-riviere-b', 'speed-angerville-1-b']
 
-feature_kwargs = {'lags_period': [18,20,23,47],
-                'lags_columns': ['Energy']}
+feature_kwargs = {'lags_period': [5, 6, 7],
+                  'lags_columns': cols}
 
-split_kwargs = {'train_pctg': 0.5,
+split_kwargs = {'train_pctg': 0.8,
                 'val_pctg': 0.1,
-                'test_pctg': 0.1,
-                'buffer_pctg':0.3}
+                'test_pctg': 0.1}
 
 constructor = (
+    Layer('Linear', None, 48, None),
+    Layer('Linear', 48, 64, 'ReLU'),
     Layer('Linear', 64, 64, 'ReLU'),
     Layer('Linear', 64, 32, 'ReLU'),
-    Layer('Linear', 32, 16, 'ReLU'),
-    Layer('Linear', 16, 1, None)
+    Layer('Linear', 32, 1, None)
 )
 
-
-
-    
 
 if __name__ == '__main__':
     if torch.cuda.is_available():
@@ -92,7 +89,7 @@ if __name__ == '__main__':
 
     # Train Network
     network, loss = train_model(network, data, criterion=loss_fn,
-                                optimizer=newoptimizer,
+                                optimizer=newoptimizer, batch_size=None,
                                 num_epochs=num_epochs, device=device)
 
     # Test Model
@@ -121,13 +118,13 @@ if __name__ == '__main__':
             print(f"Base model loss on {phase} dataset : {baseline_results[phase]:.4f}")
     
     
-    # save_result(folder ='train_result',
-    #             model = network,
-    #             train_loss = loss['train'],
-    #             val_loss = loss['val'],
-    #             cols = cols,
-    #             feature_kwargs = feature_kwargs,
-    #             feature_splits = split_kwargs,
-    #             optimizer =  newoptimizer,
-    #             test_loss = model_results,
-    #             baseline_test_loss = baseline_results)
+    save_result(folder ='train_result',
+                model = network,
+                train_loss = loss['train'],
+                val_loss = loss['val'],
+                cols = cols,
+                feature_kwargs = feature_kwargs,
+                feature_splits = split_kwargs,
+                optimizer =  newoptimizer,
+                test_loss = model_results,
+                baseline_test_loss = baseline_results)

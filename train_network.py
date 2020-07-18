@@ -55,7 +55,7 @@ def plot_loss(trainLoss, valLoss):
     plt.pause(0.0001)
 
 
-def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,
+def train_model(model, dataloaders, criterion, optimizer, batch_size=64, num_epochs=10000,
                 earlystoppingPatience=10, device=torch.device("cpu")):
     start_time = time.time()
 
@@ -75,25 +75,30 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=10000,
 
             # Load data
             inputs, labels = dataloaders[phase]
-            inputs = inputs
-            labels = labels
+            losses = []
+            if batch_size is None:
+                batch_size = inputs.size()[0]
+            for idx in range(0, inputs.size()[0], batch_size):
+                inp = inputs[idx: idx+batch_size]
+                lab = labels[idx: idx+batch_size]
 
-            # zero the parameter gradients
-            optimizer.zero_grad()
+                # zero the parameter gradients
+                optimizer.zero_grad()
 
-            #
-            # Feed forward and track history if only in train
-            with torch.set_grad_enabled(phase == 'train'):
-                # Get model prediction and calculate loss
-                preds = model(inputs.float())
-                loss = criterion(preds.double(), labels.double())
+                #
+                # Feed forward and track history if only in train
+                with torch.set_grad_enabled(phase == 'train'):
+                    # Get model prediction and calculate loss
+                    preds = model(inp.float())
+                    loss = criterion(preds.double(), lab.double())
 
-                # Back propagation + optimize only if in training phase
-                if phase == 'train':
-                    loss.backward()
-                    optimizer.step()
+                    # Back propagation + optimize only if in training phase
+                    if phase == 'train':
+                        loss.backward()
+                        optimizer.step()
+                losses.append(loss.item())
 
-            epoch_loss = loss.item()
+            epoch_loss = sum(losses)/len(losses)
 
             loss_dict[phase].append(epoch_loss)
 
