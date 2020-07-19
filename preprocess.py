@@ -86,8 +86,7 @@ class Dataset:
         print("All features combined")
 
     def train_val_test_split(self, df, train_pctg, val_pctg, test_pctg, buffer_pctg = 0,*args,**kwargs):  #ADDED BUFFER OPTION HERE!
-        """Split and store dataframe in self.train, self.val, self.test"""
-
+        """Split and store dataframe in self.train, self.val, self.test"""        
         rows = df.shape[0]
 
         max_buffer_idx = round(rows * buffer_pctg)
@@ -95,9 +94,10 @@ class Dataset:
         max_validation_idx = round(rows * val_pctg) + max_train_idx
         max_test_idx = round(rows *test_pctg) + max_validation_idx
         print(f"""
-            Completed train val test split
+            Completed buffer,train val test split ({buffer_pctg},{train_pctg},{val_pctg},{test_pctg})
             -------------------------------
             Total data : {df.shape}
+            Buffer data : {df[:max_buffer_idx].shape}
             Train data : {df[max_buffer_idx : max_train_idx].shape}
             Val data : {df[max_train_idx : max_validation_idx].shape}
             Test data {df[max_validation_idx:].shape}\n """)
@@ -150,6 +150,29 @@ class Dataset:
             Y = tensor_data[:, 0].view(-1, 1)
             X = tensor_data[:, 1:]
             dataloader_dict[key] = (X.to(device), Y.to(device))
+
+        return dataloader_dict
+    def load_ensemble_data(self, trainedmodels,device, drop_timestamp=True):
+        """Data loader for NN"""
+        dataloader_dict = dict()
+
+        if drop_timestamp:
+            self.train.drop(['Timestamp'], inplace=True, axis=1)
+            self.val.drop(['Timestamp'], inplace=True, axis=1)
+            self.test.drop(['Timestamp'], inplace=True, axis=1)
+
+        for key, value in zip(['train', 'val', 'test'],
+                              [self.train.values,
+                               self.val.values,
+                               self.test.values]):
+            tensor_data = torch.from_numpy(value)
+            Y = tensor_data[:, 0].view(-1, 1).to(device)
+            X = tensor_data[:, 1:].to(device)
+            predictions = list()
+            for model in trainedmodels:
+                predictions.append(model(x))
+            newX = torch.cat(predictions,dim=1)
+            dataloader_dict[key] = (newX, Y)
 
         return dataloader_dict
 

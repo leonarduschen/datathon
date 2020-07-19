@@ -53,6 +53,21 @@ def generateANN(constructor, input_shape):
         model = CustomNNSequential(layers)
     return model
 
+class EnsembleModel(nn.Module):
+    def __init__(self, *args,**kwargs):
+        super(MyEnsemble, self).__init__()
+        self.models = args
+        self.classifier = nn.Linear(len(args), 1)
+        
+    def forward(self, x1, x2):
+        for model in self.models:
+            data = model()
+        x1 = self.modelA(x1)
+        x2 = self.modelB(x2)
+        x = torch.cat((x1, x2), dim=1)
+        x = self.classifier(F.relu(x))
+        return x
+
 # Define loss criterion
 loss_fn = torch.nn.L1Loss()
 
